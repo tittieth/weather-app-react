@@ -1,8 +1,9 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { optionType } from "./types";
 
 const App = (): JSX.Element => {
   const [term, setTerm] = useState<string>('');
+  const [city, setCity] = useState<optionType | null>(null);
   const [options, setOptions] = useState<[]>([]);
 
   const getSearchOptions = (value: string) => {
@@ -20,13 +21,27 @@ const App = (): JSX.Element => {
     getSearchOptions(value)
   }
 
-  const onOptionSelect = (option: optionType) => {
-    console.log(option.name);
-
-    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${option.lat}&lon=${option.lon}&units=metric&appid=${import.meta.env.VITE_API_KEY}`)
+  const getForecast = (city: optionType) => {
+    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&units=metric&appid=${import.meta.env.VITE_API_KEY}`)
     .then(res => res.json())
     .then((data) => console.log({data}))
   }
+
+  const onSubmit = () => {
+    if (!city) return
+    getForecast(city)
+  }
+
+  const onOptionSelect = (option: optionType) => {
+    setCity(option);
+  }
+
+  useEffect(() => {
+    if(city) {
+      setTerm(city.name);
+      setOptions([]);
+    }
+  }, [city])
 
   //http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid={API key}
 
@@ -63,7 +78,7 @@ const App = (): JSX.Element => {
             ))}
           </ul>
 
-          <button className="rounded-r-md border-2 border-zinc-100 px-2 py-1 cursor-pointer">
+          <button className="rounded-r-md border-2 border-zinc-100 px-2 py-1 cursor-pointer" onClick={onSubmit}>
             Search
           </button>
         </div>
