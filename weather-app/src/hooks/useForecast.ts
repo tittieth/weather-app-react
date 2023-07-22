@@ -1,11 +1,11 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import { optionType } from "./types";
-import Search from "./Search";
+import { optionType } from "../types";
 
-const App = (): JSX.Element => {
-  const [term, setTerm] = useState<string>('');
+const useForecast = () => {
+    const [term, setTerm] = useState<string>('');
   const [city, setCity] = useState<optionType | null>(null);
   const [options, setOptions] = useState<[]>([]);
+  const [forecast, setForecast] = useState<null>(null);
 
   const getSearchOptions = (value: string) => {
     fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${value.trim()}&limit=5&appid=${import.meta.env.VITE_API_KEY}`)
@@ -25,7 +25,7 @@ const App = (): JSX.Element => {
   const getForecast = (city: optionType) => {
     fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&units=metric&appid=${import.meta.env.VITE_API_KEY}`)
     .then(res => res.json())
-    .then((data) => console.log({data}))
+    .then((data) => setForecast(data))
   }
 
   const onSubmit = () => {
@@ -44,18 +44,11 @@ const App = (): JSX.Element => {
     }
   }, [city])
 
-  //http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid={API key}
+  return {
+    term, options, forecast, onInputChange, onOptionSelect, onSubmit
+  }
+}
 
-  return (
-    <main className="flex justify-center items-center bg-gradient-to-br from-sky-400 via-rose-400 to-lime-400 h-[100vh] w-full">
-     <Search 
-      term={term} 
-      options={options} 
-      onInputChange={onInputChange} 
-      onOptionSelect={onOptionSelect} 
-      onSubmit={onSubmit} ></Search>
-    </main>
-  );
-};
 
-export default App;
+
+export default useForecast
