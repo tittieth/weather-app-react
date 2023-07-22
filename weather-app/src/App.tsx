@@ -1,4 +1,5 @@
 import { ChangeEvent, useState } from "react";
+import { optionType } from "./types";
 
 const App = (): JSX.Element => {
   const [term, setTerm] = useState<string>('');
@@ -19,8 +20,12 @@ const App = (): JSX.Element => {
     getSearchOptions(value)
   }
 
-  const onOptionSelect = (option) => {
+  const onOptionSelect = (option: optionType) => {
+    console.log(option.name);
 
+    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${option.lat}&lon=${option.lon}&units=metric&appid=${import.meta.env.VITE_API_KEY}`)
+    .then(res => res.json())
+    .then((data) => console.log({data}))
   }
 
   //http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid={API key}
@@ -49,16 +54,16 @@ const App = (): JSX.Element => {
           />
 
           <ul className="absolute top-9 bg-white ml-1 rounded-b-md">
-            {options.map((option: { name:string }, index:number) => (
+            {options.map((option: optionType, index:number) => (
               <li key={option.name + '-' + index}>
-                <button className="text-left text-sm w-full hover:bg-zinc-700 hover:text-white px-2 py-1 cursor-pointer">
+                <button className="text-left text-sm w-full hover:bg-zinc-700 hover:text-white px-2 py-1 cursor-pointer" onClick={() => onOptionSelect(option)}>
                   {option.name}
                 </button>
               </li>
             ))}
           </ul>
 
-          <button className="rounded-r-md border-2 border-zinc-100 px-2 py-1 cursor-pointer" onClick={() => onOptionSelect(option)}>
+          <button className="rounded-r-md border-2 border-zinc-100 px-2 py-1 cursor-pointer">
             Search
           </button>
         </div>
