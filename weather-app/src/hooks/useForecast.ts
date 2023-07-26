@@ -10,7 +10,7 @@ const useForecast = () => {
   const getSearchOptions = (value: string) => {
     fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${value.trim()}&limit=5&appid=${import.meta.env.VITE_API_KEY}`)
     .then((res) => res.json())
-    .then((data) => setOptions(data))
+    .then((data) => setOptions(data)).catch(e => console.log(e))
   }
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -31,7 +31,7 @@ const useForecast = () => {
             list: data.list.slice(0, 16),
         }
         setForecast(forecastData)
-    })
+    }).catch(e => console.log(e))
   }
 
   const onSubmit = () => {
